@@ -59,11 +59,11 @@ def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 users = {
-    "bendahara": {"password": hash_password("1"), "role": "Bendahara"},
-    "anggota": {"password": hash_password("password456"), "role": "Anggota"}
+    "bendahara": {"password": st.secrets["P@ssw0rd"], "role": "Bendahara"},
+    "anggota": {"password": st.secrets["himasisko2025"], "role": "Anggota"}
 }
 
-# Login function
+# Login Function
 def login(username, password):
     if username in users and users[username]["password"] == hash_password(password):
         st.session_state.authenticated = True
