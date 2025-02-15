@@ -110,12 +110,13 @@ def main_app():
                 for transaction in st.session_state.transactions:
                     transaction_copy = transaction.copy()
                     if isinstance(transaction_copy['date'], (pd.Timestamp, datetime)):
-                        transaction_copy['date'] = transaction_copy['date'].isoformat()
+                        # Convert to Asia/Jakarta timezone before saving
+                        jakarta_tz = pytz.timezone('Asia/Jakarta')
+                        transaction_copy['date'] = transaction_copy['date'].astimezone(jakarta_tz).isoformat()
                     writer.writerow(transaction_copy)
             print("Transactions saved successfully")
         except Exception as e:
             st.error(f"Error saving transactions: {str(e)}")
-
         # Save members
         members_file = data_path / "members.csv"
         try:
@@ -226,8 +227,6 @@ def main_app():
             fig.update_traces(hovertemplate='Sumber: %{label}<br>Jumlah: Rp %{value:,.0f}')
             st.plotly_chart(fig, use_container_width=True)
             
-        # Riwayat transaksi dengan tombol hapus
-                # Riwayat transaksi dengan tombol hapus
         st.subheader("Transaksi Terbaru")
         if len(st.session_state.transactions) > 0:
             recent_transactions = df.sort_values('date', ascending=False).head(10).copy()
@@ -236,7 +235,10 @@ def main_app():
             for _, row in recent_transactions.iterrows():
                 with st.container():
                     col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 3, 1, 1])
-                    col1.write(row['date'].tz_convert(pytz.timezone('Asia/Jakarta')).strftime('%Y-%m-%d %H:%M:%S'))
+                    # Convert UTC time to Asia/Jakarta timezone
+                    jakarta_time = row['date'].tz_convert('Asia/Jakarta')
+                    col1.write(jakarta_time.strftime('%Y-%m-%d %H:%M:%S'))
+                   #col1.write(row['date'].tz_convert(pytz.timezone('Asia/Jakarta')).strftime('%Y-%m-%d %H:%M:%S'))
                     col2.write(row['source'])
                     col3.write(format_rupiah(row['amount']))
                     col4.write(row['description'])
@@ -267,7 +269,8 @@ def main_app():
         st.subheader("Semua Transaksi")
         if len(st.session_state.transactions) > 0:
             all_transactions = df.sort_values('date', ascending=False).copy()
-            all_transactions['date'] = all_transactions['date'].dt.tz_convert(pytz.timezone('Asia/Jakarta')).dt.strftime('%Y-%m-%d %H:%M:%S')
+            all_transactions['date'] = all_transactions['date'].dt.tz_convert('Asia/Jakarta').dt.strftime('%Y-%m-%d %H:%M:%S')
+            #all_transactions['date'] = all_transactions['date'].dt.tz_convert(pytz.timezone('Asia/Jakarta')).dt.strftime('%Y-%m-%d %H:%M:%S')
             
             # Reorder columns to show member_name and member_role separately
             columns_order = ['date', 'source', 'amount', 'description', 'member_name', 'member_role']
