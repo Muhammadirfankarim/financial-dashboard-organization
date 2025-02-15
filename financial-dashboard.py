@@ -58,17 +58,20 @@ if 'user_role' not in st.session_state:
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
+# Modify the users dictionary
 users = {
     "bendahara": {"password": st.secrets["bendahara_password"], "role": "Bendahara"},
     "anggota": {"password": st.secrets["anggota_password"], "role": "Anggota"}
 }
 
-# Login Function
+# Modify the login function
 def login(username, password):
-    if username in users and users[username]["password"] == hash_password(password):
-        st.session_state.authenticated = True
-        st.session_state.user_role = users[username]["role"]
-        return True
+    if username in users:
+        stored_password = users[username]["password"]
+        if hash_password(password) == hash_password(stored_password):
+            st.session_state.authenticated = True
+            st.session_state.user_role = users[username]["role"]
+            return True
     return False
 
 # Login page
