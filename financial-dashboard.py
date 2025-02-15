@@ -59,8 +59,8 @@ def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 users = {
-    "bendahara": {"password": st.secrets["P@ssw0rd"], "role": "Bendahara"},
-    "anggota": {"password": st.secrets["himasisko2025"], "role": "Anggota"}
+    "bendahara": {"password": st.secrets["bendahara_password"], "role": "Bendahara"},
+    "anggota": {"password": st.secrets["anggota_password"], "role": "Anggota"}
 }
 
 # Login Function
